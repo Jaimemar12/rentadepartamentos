@@ -98,7 +98,7 @@ public class ProgramaRentaDepartamentos {
         System.out.println("\n1. Ver menu de clientes");
         System.out.println("2. Ver menu de departamentos");
         System.out.println("3. Ver menu de renta");
-        System.out.println("4. Terminar Programa");
+        System.out.println("4. Terminar Programa\n");
         Scanner scn = new Scanner(System.in);
         String respuesta = scn.nextLine();
         return respuesta;
@@ -109,7 +109,7 @@ public class ProgramaRentaDepartamentos {
         System.out.println("2. Ver clientes");
         System.out.println("3. Editar cliente");
         System.out.println("4. Borrar cliente");
-        System.out.println("5. Volver a menu principal");
+        System.out.println("5. Volver a menu principal\n");
         Scanner scn = new Scanner(System.in);
         String respuesta = scn.nextLine();
         return respuesta;
@@ -120,7 +120,7 @@ public class ProgramaRentaDepartamentos {
         System.out.println("2. Ver departamentos");
         System.out.println("3. Editar departamento");
         System.out.println("4. Borrar departamento");
-        System.out.println("5. Volver a menu principal");
+        System.out.println("5. Volver a menu principal\n");
         Scanner scn = new Scanner(System.in);
         String respuesta = scn.nextLine();
         return respuesta;
@@ -131,7 +131,7 @@ public class ProgramaRentaDepartamentos {
         System.out.println("2. Ver rentas");
         System.out.println("3. Editar renta");
         System.out.println("4. Borrar renta");
-        System.out.println("5. Volver a menu principal");
+        System.out.println("5. Volver a menu principal\n");
         Scanner scn = new Scanner(System.in);
         String respuesta = scn.nextLine();
         return respuesta;

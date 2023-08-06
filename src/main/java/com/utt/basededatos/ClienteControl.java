@@ -25,7 +25,7 @@ public class ClienteControl {
 
     public static boolean crearCliente(String nombre, String apellido, String direccion, String telefono,
             String correo) {
-        if (buscarCliente(telefono) != null) {
+        if (buscarClientePorTelefono(telefono) != null) {
             return false;
         }
 
@@ -41,10 +41,20 @@ public class ClienteControl {
         return false;
     }
 
-    public static Document buscarCliente(String telefono) {
+    public static Document buscarClientePorTelefono(String telefono) {
         try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
             MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
             return baseDeDatos.getCollection(COLECCION).find(new Document("telefono", telefono)).first();
+        } catch (MongoException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Document buscarClientePorID(String idCliente) {
+        try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
+            MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
+            return baseDeDatos.getCollection(COLECCION).find(new Document("_id", idCliente)).first();
         } catch (MongoException e) {
             e.printStackTrace();
         }
@@ -67,7 +77,7 @@ public class ClienteControl {
     }
 
     public static boolean actualizarCliente(String telefono, String variable, String valor) {
-        if (buscarCliente(telefono) == null) {
+        if (buscarClientePorTelefono(telefono) == null) {
             return false;
         }
 
@@ -82,7 +92,7 @@ public class ClienteControl {
     }
 
     public static boolean borrarCliente(String telefono) {
-        if (buscarCliente(telefono) == null) {
+        if (buscarClientePorTelefono(telefono) == null) {
             return false;
         }
 
@@ -97,7 +107,7 @@ public class ClienteControl {
     }
 
     public static String getID(String telefono) {
-        Document cliente = buscarCliente(telefono);
+        Document cliente = buscarClientePorTelefono(telefono);
         if (cliente == null) {
             return null;
         }

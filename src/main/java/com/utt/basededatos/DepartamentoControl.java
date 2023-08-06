@@ -24,7 +24,7 @@ public class DepartamentoControl {
     }
 
     public static boolean crearDepartamento(String ubicacion, String numRecamaras, String precio) {
-        if (buscarDepartamento(ubicacion) != null) {
+        if (buscarDepartamentoPorUbicacion(ubicacion) != null) {
             return false;
         }
 
@@ -40,10 +40,20 @@ public class DepartamentoControl {
         return false;
     }
 
-    public static Document buscarDepartamento(String ubicacion) {
+    public static Document buscarDepartamentoPorUbicacion(String ubicacion) {
         try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
             MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
             return baseDeDatos.getCollection(COLECCION).find(new Document("ubicacion", ubicacion)).first();
+        } catch (MongoException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Document buscarDepartamentoPorID(String idDepartamento) {
+        try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
+            MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
+            return baseDeDatos.getCollection(COLECCION).find(new Document("_id", idDepartamento)).first();
         } catch (MongoException e) {
             e.printStackTrace();
         }
@@ -66,7 +76,7 @@ public class DepartamentoControl {
     }
 
     public static boolean actualizarDepartamento(String ubicacion, String variable, String valor) {
-        if (buscarDepartamento(ubicacion) == null) {
+        if (buscarDepartamentoPorUbicacion(ubicacion) == null) {
             return false;
         }
 
@@ -81,7 +91,7 @@ public class DepartamentoControl {
     }
 
     public static boolean borrarDepartamento(String ubicacion) {
-        if (buscarDepartamento(ubicacion) == null) {
+        if (buscarDepartamentoPorUbicacion(ubicacion) == null) {
             return false;
         }
 
@@ -110,7 +120,7 @@ public class DepartamentoControl {
     }
 
     public static String getID(String ubicacion) {
-        Document departamento = buscarDepartamento(ubicacion);
+        Document departamento = buscarDepartamentoPorUbicacion(ubicacion);
         if (departamento == null) {
             return null;
         }

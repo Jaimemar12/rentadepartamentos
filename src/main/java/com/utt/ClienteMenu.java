@@ -31,31 +31,31 @@ public class ClienteMenu implements Menu {
             System.out.println("Ingresa el correo del cliente:");
             correo = scn.nextLine();
         } while (!ClienteControl.crearCliente(nombre, apellido, direccion, telefono, correo));
-        System.out.println("Nuevo cliente creado");
+        System.out.println("\nNuevo cliente creado");
     }
 
     @Override
     public void ver() {
         while (true) {
             System.out.println("\n1. Buscar cliente");
-            System.out.println("2. Ver informacion de todos los clientes");
+            System.out.println("2. Ver informacion de todos los clientes\n");
             Scanner scn = new Scanner(System.in);
             String respuesta = scn.nextLine();
             if (respuesta.equals("1")) {
                 System.out.println("\nIngresa el telefono del cliente");
                 String telefono = scn.nextLine();
-                Document cliente = ClienteControl.buscarCliente(telefono);
+                Document cliente = ClienteControl.buscarClientePorTelefono(telefono);
                 if (cliente == null) {
-                    System.out.println("No se encontro cliente");
-                    continue;
+                    System.out.println("\nNo se encontro cliente");
+                    return;
                 } else {
-                    System.out.println(cliente.toJson());
+                    mostrarCliente(cliente);
                     return;
                 }
             } else if (respuesta.equals("2")) {
                 Set<Document> clientes = ClienteControl.buscarClientes();
                 for (Document cliente : clientes) {
-                    System.out.println(cliente.toJson());
+                    mostrarCliente(cliente);
                 }
                 return;
             }
@@ -69,16 +69,16 @@ public class ClienteMenu implements Menu {
             Scanner scn = new Scanner(System.in);
             System.out.println("\nIngresa el telefono del cliente");
             String telefono = scn.nextLine();
-            Document cliente = ClienteControl.buscarCliente(telefono);
+            Document cliente = ClienteControl.buscarClientePorTelefono(telefono);
             if (cliente == null) {
-                System.out.println("No se encontro cliente");
+                System.out.println("\nNo se encontro cliente");
             } else {
                 System.out.println("\nQue deseas actualizar?");
                 System.out.println("1. Nombre");
                 System.out.println("2. Apellido");
                 System.out.println("3. Direccion");
                 System.out.println("4. Correo");
-                System.out.println("5. Telefono");
+                System.out.println("5. Telefono\n");
                 String opcion = scn.nextLine();
 
                 switch (opcion) {
@@ -102,7 +102,7 @@ public class ClienteMenu implements Menu {
                 System.out.println("\nIngresa el nuevo valor:");
                 String valor = scn.nextLine();
                 ClienteControl.actualizarCliente(telefono, variable, valor);
-                System.out.println("Cliente editado");
+                System.out.println("\nCliente editado");
                 return;
             }
         }
@@ -113,11 +113,11 @@ public class ClienteMenu implements Menu {
         while (true) {
             Scanner scn = new Scanner(System.in);
             System.out.println(
-                    "Ingresa el telefono del cliente que deseas borrar\nNota: Si el cliente tiene renta o departamento enralazado estos datos seran borrados igual");
+                    "\nIngresa el telefono del cliente que deseas borrar\nNota: Si el cliente tiene renta o departamento enralazado estos datos seran borrados igual\n");
             String telefono = scn.nextLine();
-            Document cliente = ClienteControl.buscarCliente(telefono);
+            Document cliente = ClienteControl.buscarClientePorTelefono(telefono);
             if (cliente == null) {
-                System.out.println("No se encontro cliente");
+                System.out.println("\nNo se encontro cliente\n");
             } else {
                 String idCliente = ClienteControl.getID(telefono);
                 String idDepartamento = RentaControl.getDepartamentoID(idCliente);
@@ -125,10 +125,28 @@ public class ClienteMenu implements Menu {
                 ClienteControl.borrarCliente(telefono);
                 DepartamentoControl.borrarDepartamento(ubicacion);
                 RentaControl.borrarRenta(idCliente);
-                System.out.println("Cliente borrado");
+                System.out.println("\nCliente borrado");
                 return;
             }
         }
     }
 
+    // BORRAR ESTOOOOOOOOOOOOOOOOOOOOOO: Si quieren agregar id solo poner un nuevo append y usar _id
+    private void mostrarCliente(Document cliente) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n");
+        for (int i = 0; i < 80; i++) {
+            stringBuilder.append("-");
+        }
+        stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
+        stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
+        stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
+        stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
+        stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
+        for (int i = 0; i < 80; i++) {
+            stringBuilder.append("-");
+        }
+        stringBuilder.append("\n");
+        System.out.println(stringBuilder.toString());
+    }
 }
