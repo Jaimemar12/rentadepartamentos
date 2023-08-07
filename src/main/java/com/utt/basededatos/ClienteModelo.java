@@ -9,6 +9,7 @@ class ClienteModelo {
     private String direccion;
     private String telefono;
     private String correo;
+    private String estado;
 
     ClienteModelo(String nombre, String apellido, String direccion, String telefono, String correo) {
         this.nombre = nombre;
@@ -16,6 +17,7 @@ class ClienteModelo {
         this.direccion = direccion;
         this.telefono = telefono;
         this.correo = correo;
+        this.estado = "Activo";
     }
 
     Document comoBson() {
@@ -25,6 +27,7 @@ class ClienteModelo {
         cliente.append("direccion", direccion);
         cliente.append("telefono", telefono);
         cliente.append("correo", correo);
+        cliente.append("estado", estado);
         return cliente;
     }
 }

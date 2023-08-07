@@ -38,7 +38,8 @@ public class ClienteMenu implements Menu {
     public void ver() {
         while (true) {
             System.out.println("\n1. Buscar cliente");
-            System.out.println("2. Ver informacion de todos los clientes\n");
+            System.out.println("2. Ver informacion de todos los clientes activos");
+            System.out.println("3. Ver informacion de todos los clientes inactivos\n");
             Scanner scn = new Scanner(System.in);
             String respuesta = scn.nextLine();
             if (respuesta.equals("1")) {
@@ -49,13 +50,19 @@ public class ClienteMenu implements Menu {
                     System.out.println("\nNo se encontro cliente");
                     return;
                 } else {
-                    mostrarCliente(cliente);
+                    mostrarClienteActivo(cliente);
                     return;
                 }
             } else if (respuesta.equals("2")) {
                 Set<Document> clientes = ClienteControl.buscarClientes();
                 for (Document cliente : clientes) {
-                    mostrarCliente(cliente);
+                    mostrarClienteActivo(cliente);
+                }
+                return;
+            } else if (respuesta.equals("3")) {
+                Set<Document> clientes = ClienteControl.buscarClientes();
+                for (Document cliente : clientes) {
+                    mostrarClienteInactivo(cliente);
                 }
                 return;
             }
@@ -131,22 +138,43 @@ public class ClienteMenu implements Menu {
         }
     }
 
-    // BORRAR ESTOOOOOOOOOOOOOOOOOOOOOO: Si quieren agregar id solo poner un nuevo append y usar _id
-    private void mostrarCliente(Document cliente) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n");
-        for (int i = 0; i < 80; i++) {
-            stringBuilder.append("-");
+    private void mostrarClienteActivo(Document cliente) {
+        if (cliente.get("estado").equals("Activo")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
+            stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
+            stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
+            stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
+            stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\n");
+            System.out.println(stringBuilder.toString());
         }
-        stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
-        stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
-        stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
-        stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
-        stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
-        for (int i = 0; i < 80; i++) {
-            stringBuilder.append("-");
+    }
+
+    private void mostrarClienteInactivo(Document cliente) {
+        if (cliente.get("estado").equals("Inactivo")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
+            stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
+            stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
+            stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
+            stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\n");
+            System.out.println(stringBuilder.toString());
         }
-        stringBuilder.append("\n");
-        System.out.println(stringBuilder.toString());
     }
 }

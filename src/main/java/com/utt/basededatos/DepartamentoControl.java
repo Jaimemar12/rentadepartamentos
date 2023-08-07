@@ -91,18 +91,7 @@ public class DepartamentoControl {
     }
 
     public static boolean borrarDepartamento(String ubicacion) {
-        if (buscarDepartamentoPorUbicacion(ubicacion) == null) {
-            return false;
-        }
-
-        try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
-            MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
-            baseDeDatos.getCollection(COLECCION).deleteOne(eq("ubicacion", ubicacion));
-            return true;
-        } catch (MongoException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return actualizarDepartamento(ubicacion, "estado", "Inactivo");
     }
 
     public static String getUbicacion(String idDepartamento) {

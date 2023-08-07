@@ -7,17 +7,19 @@ class RentaModelo {
     private String fechaInicio;
     private String fechaFin;
     private String montoRenta;
-    private String montoPago;
+    private String motivo;
     private String idDepartamento;
     private String idCliente;
+    private String estado;
 
-    RentaModelo(String fechaInicio, String fechaFin, String montoRenta, String montoPago, String idDepartamento, String idCliente) {
+    RentaModelo(String fechaInicio, String fechaFin, String montoRenta, String idDepartamento, String idCliente) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.montoRenta = montoRenta;
-        this.montoPago = montoPago;
+        this.motivo = "";
         this.idDepartamento = idDepartamento;
         this.idCliente = idCliente;
+        this.estado = "Activo";
     }
 
     Document comoBson() {
@@ -25,9 +27,10 @@ class RentaModelo {
         renta.append("fecha_inicio", fechaInicio);
         renta.append("fecha_fin", fechaFin);
         renta.append("monto_renta", montoRenta);
-        renta.append("monto_pago", montoPago);
+        renta.append("motivo", motivo);
         renta.append("id_departamento", idDepartamento);
         renta.append("id_cliente", idCliente);
+        renta.append("estado", estado);
         return renta;
     }
 }

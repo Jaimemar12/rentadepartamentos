@@ -92,18 +92,7 @@ public class ClienteControl {
     }
 
     public static boolean borrarCliente(String telefono) {
-        if (buscarClientePorTelefono(telefono) == null) {
-            return false;
-        }
-
-        try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
-            MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
-            baseDeDatos.getCollection(COLECCION).deleteOne(eq("telefono", telefono));
-            return true;
-        } catch (MongoException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return actualizarCliente(telefono, "estado", "Inactivo");
     }
 
     public static String getID(String telefono) {

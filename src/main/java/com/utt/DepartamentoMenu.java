@@ -32,7 +32,8 @@ public class DepartamentoMenu implements Menu {
     public void ver() {
         while (true) {
             System.out.println("\n1. Buscar departamento");
-            System.out.println("2. Ver informacion de todos los departamentos\n");
+            System.out.println("2. Ver informacion de todos los departamentos activos");
+            System.out.println("3. Ver informacion de todos los departamentos inactivos\n");
             Scanner scn = new Scanner(System.in);
             String respuesta = scn.nextLine();
             if (respuesta.equals("1")) {
@@ -43,13 +44,19 @@ public class DepartamentoMenu implements Menu {
                     System.out.println("\nNo se encontro departamento");
                     continue;
                 } else {
-                    mostrarDepartamento(departamento);
+                    mostrarDepartamentoActivo(departamento);
                     return;
                 }
             } else if (respuesta.equals("2")) {
                 Set<Document> departamentos = DepartamentoControl.buscarDepartamentos();
                 for (Document departamento : departamentos) {
-                    mostrarDepartamento(departamento);
+                    mostrarDepartamentoActivo(departamento);
+                }
+                return;
+            } else if (respuesta.equals("3")) {
+                Set<Document> departamentos = DepartamentoControl.buscarDepartamentos();
+                for (Document departamento : departamentos) {
+                    mostrarDepartamentoInactivo(departamento);
                 }
                 return;
             }
@@ -117,19 +124,39 @@ public class DepartamentoMenu implements Menu {
         }
     }
 
-    private void mostrarDepartamento(Document departamento) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n");
-        for (int i = 0; i < 80; i++) {
-            stringBuilder.append("-");
+    private void mostrarDepartamentoActivo(Document departamento) {
+        if (departamento.get("estado").equals("Activo")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\nUbicacion:\t\t" + departamento.get("ubicacion") + "\n");
+            stringBuilder.append("Numero de recamaras:\t" + departamento.get("numero_recamaras") + "\n");
+            stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\n");
+            System.out.println(stringBuilder.toString());
         }
-        stringBuilder.append("\nUbicacion:\t\t" + departamento.get("ubicacion") + "\n");
-        stringBuilder.append("Numero de recamaras:\t" + departamento.get("numero_recamaras") + "\n");
-        stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
-        for (int i = 0; i < 80; i++) {
-            stringBuilder.append("-");
+    }
+
+    private void mostrarDepartamentoInactivo(Document departamento) {
+        if (departamento.get("estado").equals("Inactivo")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\nUbicacion:\t\t" + departamento.get("ubicacion") + "\n");
+            stringBuilder.append("Numero de recamaras:\t" + departamento.get("numero_recamaras") + "\n");
+            stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\n");
+            System.out.println(stringBuilder.toString());
         }
-        stringBuilder.append("\n");
-        System.out.println(stringBuilder.toString());
     }
 }

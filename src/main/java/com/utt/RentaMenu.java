@@ -16,7 +16,6 @@ public class RentaMenu implements Menu {
         String fechaInicio = "";
         String fechaFin = "";
         String montoRenta = "";
-        String montoPago = "";
         String ubicacion = "";
         String telefono = "";
         String idCliente = null;
@@ -43,9 +42,7 @@ public class RentaMenu implements Menu {
             fechaFin = scn.nextLine();
             System.out.println("Ingresa el monto de renta:");
             montoRenta = scn.nextLine();
-            System.out.println("Ingresa el monto de pago:");
-            montoPago = scn.nextLine();
-        } while (!RentaControl.crearRenta(fechaInicio, fechaFin, montoRenta, montoPago, idDepartamento, idCliente));
+        } while (!RentaControl.crearRenta(fechaInicio, fechaFin, montoRenta, idDepartamento, idCliente));
         System.out.println("\nNueva renta creada");
     }
 
@@ -53,7 +50,8 @@ public class RentaMenu implements Menu {
     public void ver() {
         while (true) {
             System.out.println("\n1. Buscar renta");
-            System.out.println("2. Ver informacion de todas las rentas\n");
+            System.out.println("2. Ver informacion de todas las rentas activas");
+            System.out.println("3. Ver informacion de todas las rentas inactivas\n");
             Scanner scn = new Scanner(System.in);
             String respuesta = scn.nextLine();
             if (respuesta.equals("1")) {
@@ -68,14 +66,20 @@ public class RentaMenu implements Menu {
                     if (renta == null) {
                         System.out.println("\nNo se encontro renta");
                     } else {
-                        mostrarRenta(renta);
+                        mostrarRentaActiva(renta);
                     }
                     return;
                 }
             } else if (respuesta.equals("2")) {
                 Set<Document> rentas = RentaControl.buscarRentas();
                 for (Document renta : rentas) {
-                    mostrarRenta(renta);
+                    mostrarRentaActiva(renta);
+                }
+                return;
+            } else if (respuesta.equals("3")) {
+                Set<Document> rentas = RentaControl.buscarRentas();
+                for (Document renta : rentas) {
+                    mostrarRentaInactiva(renta);
                 }
                 return;
             }
@@ -103,7 +107,7 @@ public class RentaMenu implements Menu {
                     System.out.println("1. Fecha de inicio");
                     System.out.println("2. Fecha final");
                     System.out.println("3. Monto de renta");
-                    System.out.println("4. Monto de pago\n");
+                    System.out.println("4. Motivo de cancelacion");
                     String opcion = scn.nextLine();
 
                     switch (opcion) {
@@ -117,7 +121,7 @@ public class RentaMenu implements Menu {
                             variable = "monto_renta";
                             break;
                         case "4":
-                            variable = "monto_pago";
+                            variable = "motivo";
                             break;
                     }
 
@@ -146,6 +150,10 @@ public class RentaMenu implements Menu {
                 if (renta == null) {
                     System.out.println("\nNo se encontro renta");
                 } else {
+                    System.out.println(
+                            "\nIngresa el motivo de cancelacion");
+                    String motivo = scn.nextLine();
+                    RentaControl.actualizarRenta(idCliente, "motivo", motivo);
                     String idDepartamento = RentaControl.getDepartamentoID(idCliente);
                     String ubicacion = DepartamentoControl.getUbicacion(idDepartamento);
                     ClienteControl.borrarCliente(telefono);
@@ -158,32 +166,64 @@ public class RentaMenu implements Menu {
         }
     }
 
-    private void mostrarRenta(Document renta) {
-        StringBuilder stringBuilder = new StringBuilder();
+    private void mostrarRentaActiva(Document renta) {
+        if (renta.get("estado").equals("Activo")) {
+            StringBuilder stringBuilder = new StringBuilder();
 
-        Document cliente = ClienteControl.buscarClientePorID(renta.get("id_cliente").toString());
-        Document departamento = DepartamentoControl.buscarDepartamentoPorID(renta.get("id_departamento").toString());
-        stringBuilder.append("\n");
-        for (int i = 0; i < 80; i++) {
-            stringBuilder.append("-");
+            Document cliente = ClienteControl.buscarClientePorID(renta.get("id_cliente").toString());
+            Document departamento = DepartamentoControl
+                    .buscarDepartamentoPorID(renta.get("id_departamento").toString());
+            stringBuilder.append("\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
+            stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
+            stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
+            stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
+            stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
+            stringBuilder.append("\nUbicacion:\t\t" + departamento.get("ubicacion") + "\n");
+            stringBuilder.append("Numero de recamaras:\t" + departamento.get("numero_recamaras") + "\n");
+            stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
+            stringBuilder.append("\nFecha de inicio:\t" + renta.get("fecha_inicio") + "\n");
+            stringBuilder.append("Fecha de fin:\t\t" + renta.get("fecha_fin") + "\n");
+            stringBuilder.append("Monto de renta:\t\t$" + renta.get("monto_renta") + "\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\n");
+            System.out.println(stringBuilder.toString());
         }
-        stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
-        stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
-        stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
-        stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
-        stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
-        stringBuilder.append("\nUbicacion:\t\t" + departamento.get("ubicacion") + "\n");
-        stringBuilder.append("Numero de recamaras:\t" + departamento.get("numero_recamaras") + "\n");
-        stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
-        stringBuilder.append("\nFecha de inicio:\t" + renta.get("fecha_inicio") + "\n");
-        stringBuilder.append("Fecha de fin:\t\t" + renta.get("fecha_fin") + "\n");
-        stringBuilder.append("Monto de renta:\t\t$" + renta.get("monto_renta") + "\n");
-        stringBuilder.append("Monto de pago:\t\t$" + renta.get("monto_pago") + "\n");
-        for (int i = 0; i < 80; i++) {
-            stringBuilder.append("-");
+    }
+
+    private void mostrarRentaInactiva(Document renta) {
+        if (renta.get("estado").equals("Inactivo")) {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            Document cliente = ClienteControl.buscarClientePorID(renta.get("id_cliente").toString());
+            Document departamento = DepartamentoControl
+                    .buscarDepartamentoPorID(renta.get("id_departamento").toString());
+            stringBuilder.append("\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\nNombre:\t\t" + cliente.get("nombre") + "\n");
+            stringBuilder.append("Apellido:\t" + cliente.get("apellido") + "\n");
+            stringBuilder.append("Direccion:\t" + cliente.get("direccion") + "\n");
+            stringBuilder.append("Correo:\t\t" + cliente.get("correo") + "\n");
+            stringBuilder.append("Telefono:\t" + cliente.get("telefono") + "\n");
+            stringBuilder.append("\nUbicacion:\t\t" + departamento.get("ubicacion") + "\n");
+            stringBuilder.append("Numero de recamaras:\t" + departamento.get("numero_recamaras") + "\n");
+            stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
+            stringBuilder.append("\nFecha de inicio:\t" + renta.get("fecha_inicio") + "\n");
+            stringBuilder.append("Fecha de fin:\t\t" + renta.get("fecha_fin") + "\n");
+            stringBuilder.append("Monto de renta:\t\t$" + renta.get("monto_renta") + "\n");
+            for (int i = 0; i < 80; i++) {
+                stringBuilder.append("-");
+            }
+            stringBuilder.append("\n");
+            System.out.println(stringBuilder.toString());
         }
-        stringBuilder.append("\n");
-        System.out.println(stringBuilder.toString());
     }
 
 }

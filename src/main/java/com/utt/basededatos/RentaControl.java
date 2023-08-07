@@ -22,12 +22,12 @@ public class RentaControl {
 
     private RentaControl(){}
 
-    public static boolean crearRenta(String fechaInicio, String fechaFin, String montoRenta, String montoPago, String idDepartamento, String idCliente) {
+    public static boolean crearRenta(String fechaInicio, String fechaFin, String montoRenta, String idDepartamento, String idCliente) {
         if (buscarRentaPorCliente(idCliente) != null) {
             return false;
         }
 
-        RentaModelo renta = new RentaModelo(fechaInicio, fechaFin, montoRenta, montoPago, idDepartamento, idCliente);
+        RentaModelo renta = new RentaModelo(fechaInicio, fechaFin, montoRenta, idDepartamento, idCliente);
 
         try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
             MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
@@ -90,18 +90,7 @@ public class RentaControl {
     }
 
     public static boolean borrarRenta(String idCliente) {
-        if (buscarRentaPorCliente(idCliente) == null) {
-            return false;
-        }
-
-        try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
-            MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);
-            baseDeDatos.getCollection(COLECCION).deleteOne(eq("id_cliente", idCliente));
-            return true;
-        } catch (MongoException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return actualizarRenta(idCliente, "estado", "Inactivo");
     }
 
     public static String getDepartamentoID(String idCliente) {
