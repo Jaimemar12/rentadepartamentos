@@ -22,12 +22,12 @@ public class RentaControl {
 
     private RentaControl(){}
 
-    public static boolean crearRenta(String fechaInicio, String fechaFin, String montoRenta, String idDepartamento, String idCliente) {
+    public static boolean crearRenta(String fechaInicio, String fechaFin, String balance, String deposito, String idDepartamento, String idCliente) {
         if (buscarRentaPorCliente(idCliente) != null) {
             return false;
         }
 
-        RentaModelo renta = new RentaModelo(fechaInicio, fechaFin, montoRenta, idDepartamento, idCliente);
+        RentaModelo renta = new RentaModelo(fechaInicio, fechaFin, balance, deposito, idDepartamento, idCliente);
 
         try (MongoClient clienteMongo = MongoClients.create(CONNECCION)) {
             MongoDatabase baseDeDatos = clienteMongo.getDatabase(BASEDEDATOS);

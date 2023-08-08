@@ -20,12 +20,23 @@ public class DepartamentoMenu implements Menu {
             Scanner scn = new Scanner(System.in);
             System.out.println("\nIngresa la ubicacion del departamento:");
             ubicacion = scn.nextLine();
-            System.out.println("Ingresa el numero de recamaras del departamento:");
-            numRecamaras = scn.nextLine();
+            while (true) {
+                System.out.println("Ingresa el numero de recamaras del departamento:");
+                numRecamaras = scn.nextLine();
+                if (numeroRecamarasValido(numRecamaras)) {
+                    break;
+                }
+                System.out.println("Solo se permite de 1-3 recamaras");
+            }
             System.out.println("Ingresa el precio del departamento:");
             precio = scn.nextLine();
         } while (!DepartamentoControl.crearDepartamento(ubicacion, numRecamaras, precio));
         System.out.println("\nNuevo departamento creado");
+    }
+
+    private boolean numeroRecamarasValido(String numRecamaras) {
+        int numero = Integer.parseInt(numRecamaras);
+        return numero > 0 && numero < 4;
     }
 
     @Override
@@ -33,7 +44,7 @@ public class DepartamentoMenu implements Menu {
         while (true) {
             System.out.println("\n1. Buscar departamento");
             System.out.println("2. Ver informacion de todos los departamentos activos");
-            System.out.println("3. Ver informacion de todos los departamentos inactivos\n");
+            System.out.println("3. Ver informacion de todos los departamentos inactivos");
             Scanner scn = new Scanner(System.in);
             String respuesta = scn.nextLine();
             if (respuesta.equals("1")) {
@@ -92,8 +103,18 @@ public class DepartamentoMenu implements Menu {
                         break;
                 }
 
-                System.out.println("\nIngresa el nuevo valor:");
-                String valor = scn.nextLine();
+                String valor = "";
+                while (true) {
+                    System.out.println("\nIngresa el nuevo valor:");
+                    valor = scn.nextLine();
+                    if (!variable.equals("numero_recamaras")) {
+                        break;
+                    }
+                    if (numeroRecamarasValido(valor)) {
+                        break;
+                    }
+                    System.out.println("Solo se permite de 1-3 recamaras");
+                }
                 DepartamentoControl.actualizarDepartamento(ubicacion, variable, valor);
                 System.out.println("\nDepartamento editado");
                 return;

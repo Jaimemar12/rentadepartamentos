@@ -1,7 +1,10 @@
 package com.utt;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bson.Document;
 
@@ -15,11 +18,13 @@ public class RentaMenu implements Menu {
     public void crear() {
         String fechaInicio = "";
         String fechaFin = "";
-        String montoRenta = "";
+        String balance = "";
         String ubicacion = "";
         String telefono = "";
         String idCliente = null;
         String idDepartamento = null;
+        String precio = "";
+        Document departamento = null;
         do {
             Scanner scn = new Scanner(System.in);
             System.out.println("\nIngresa el telefono del cliente:");
@@ -36,14 +41,38 @@ public class RentaMenu implements Menu {
                 System.out.println("\nNo se encontro departamento");
                 return;
             }
-            System.out.println("\nIngresa la fecha de inicio de la renta:");
+            departamento = DepartamentoControl.buscarDepartamentoPorID(idDepartamento);
+            precio = departamento.get("precio").toString();
+            System.out.println("\nIngresa la fecha de inicio de la renta: (aaaa-mm-dd)");
             fechaInicio = scn.nextLine();
-            System.out.println("Ingresa la fecha final de la renta:");
+            System.out.println("Ingresa la fecha final de la renta: (aaaa-mm-dd)");
             fechaFin = scn.nextLine();
-            System.out.println("Ingresa el monto de renta:");
-            montoRenta = scn.nextLine();
-        } while (!RentaControl.crearRenta(fechaInicio, fechaFin, montoRenta, idDepartamento, idCliente));
+            int meses = Period.between(LocalDate.parse(fechaInicio),
+                    LocalDate.parse(fechaFin)).getMonths();
+            balance = String.valueOf(meses * Integer.parseInt(precio));
+            pagar(String.valueOf(Integer.parseInt(precio) * 2), "deposito y primer mes de pago");
+
+        } while (!RentaControl.crearRenta(fechaInicio, fechaFin, balance, precio, idDepartamento, idCliente));
         System.out.println("\nNueva renta creada");
+    }
+
+    private void pagar(String precio, String razon) {
+        System.out.println("Se requiere $" + precio + " de " + razon + ".");
+        while (true) {
+            Scanner scn = new Scanner(System.in);
+            System.out.println("Ingresa numero de cuenta de banco.");
+            String numeroDeCuenta = scn.nextLine();
+            if (numeroDeCuentaEsValido(numeroDeCuenta)) {
+                System.out.println("Ingresa el pin de cuenta.");
+                String pin = scn.nextLine();
+                if (numeroDePinEsValido(pin)) {
+                    System.out.println("Pago se a recivido");
+                    break;
+                }
+                System.out.println("Numero de pin invalido");
+            }
+            System.out.println("Numero de cuenta invalido");
+        }
     }
 
     @Override
@@ -52,6 +81,7 @@ public class RentaMenu implements Menu {
             System.out.println("\n1. Buscar renta");
             System.out.println("2. Ver informacion de todas las rentas activas");
             System.out.println("3. Ver informacion de todas las rentas inactivas\n");
+            System.out.println("4. Pagar renta");
             Scanner scn = new Scanner(System.in);
             String respuesta = scn.nextLine();
             if (respuesta.equals("1")) {
@@ -82,6 +112,37 @@ public class RentaMenu implements Menu {
                     mostrarRentaInactiva(renta);
                 }
                 return;
+            } else if (respuesta.equals("4")) {
+                Document departamento = null;
+                String precio = "";
+                while (true) {
+
+                    System.out.println("\nIngresa la ubicacion del departamento");
+                    String ubicacion = scn.nextLine();
+                    departamento = DepartamentoControl.buscarDepartamentoPorUbicacion(ubicacion);
+                    if (departamento == null) {
+                        System.out.println("\nNo se encontro departamento");
+                    } else {
+                        System.out.println("Hubo dias de retraso? (si/no)");
+                        respuesta = scn.nextLine();
+                        if (respuesta.toLowerCase().equals("si")) {
+                            System.out.println("Ingresa el numero de dias de retraso:");
+                            String dias = scn.nextLine();
+                            int departamentoPrecio = Integer.parseInt(departamento.get("precio").toString());
+                            precio = String.valueOf(
+                                    departamentoPrecio + (Integer.parseInt(dias) * (departamentoPrecio * .05)));
+                            break;
+                        } else if (respuesta.toLowerCase().equals("no")) {
+                            precio = departamento.get("precio").toString();
+                            break;
+                        }
+                    }
+                }
+                pagar(precio, "renta");
+                String idCliente = RentaControl.getClienteID(departamento.get("_id").toString());
+                Document renta = RentaControl.buscarRentaPorCliente(idCliente);
+                String nuevoBalance = String.valueOf(Integer.parseInt(renta.get("balance").toString()) - Integer.parseInt(precio));
+                RentaControl.actualizarRenta(idCliente, "balance", nuevoBalance);
             }
         }
     }
@@ -106,8 +167,9 @@ public class RentaMenu implements Menu {
                     System.out.println("\nQue deseas actualizar?");
                     System.out.println("1. Fecha de inicio");
                     System.out.println("2. Fecha final");
-                    System.out.println("3. Monto de renta");
-                    System.out.println("4. Motivo de cancelacion");
+                    System.out.println("3. Balance");
+                    System.out.println("4. Deposito");
+                    System.out.println("5. Motivo de cancelacion");
                     String opcion = scn.nextLine();
 
                     switch (opcion) {
@@ -118,9 +180,12 @@ public class RentaMenu implements Menu {
                             variable = "fecha_fin";
                             break;
                         case "3":
-                            variable = "monto_renta";
+                            // TODO:
                             break;
                         case "4":
+                            variable = "deposito";
+                            break;
+                        case "5":
                             variable = "motivo";
                             break;
                     }
@@ -187,7 +252,8 @@ public class RentaMenu implements Menu {
             stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
             stringBuilder.append("\nFecha de inicio:\t" + renta.get("fecha_inicio") + "\n");
             stringBuilder.append("Fecha de fin:\t\t" + renta.get("fecha_fin") + "\n");
-            stringBuilder.append("Monto de renta:\t\t$" + renta.get("monto_renta") + "\n");
+            stringBuilder.append("Deposito:\t\t$" + renta.get("deposito") + "\n");
+            stringBuilder.append("Balance:\t\t$" + renta.get("balance") + "\n");
             for (int i = 0; i < 80; i++) {
                 stringBuilder.append("-");
             }
@@ -217,13 +283,27 @@ public class RentaMenu implements Menu {
             stringBuilder.append("Precio:\t\t\t$" + departamento.get("precio") + "\n");
             stringBuilder.append("\nFecha de inicio:\t" + renta.get("fecha_inicio") + "\n");
             stringBuilder.append("Fecha de fin:\t\t" + renta.get("fecha_fin") + "\n");
-            stringBuilder.append("Monto de renta:\t\t$" + renta.get("monto_renta") + "\n");
+            stringBuilder.append("Deposito:\t\t\t$" + renta.get("deposito") + "\n");
+            stringBuilder.append("Balance:\t\t$" + renta.get("balance") + "\n");
+            stringBuilder.append("Motivo de cancelacion:\t" + renta.get("motivo") + "\n");
             for (int i = 0; i < 80; i++) {
                 stringBuilder.append("-");
             }
             stringBuilder.append("\n");
             System.out.println(stringBuilder.toString());
         }
+    }
+
+    private boolean numeroDeCuentaEsValido(String numeroDeCuenta) {
+        String expresion = "^[0-9]{9,18}$";
+        Pattern patron = Pattern.compile(expresion);
+        return patron.matcher(numeroDeCuenta).matches();
+    }
+
+    private boolean numeroDePinEsValido(String pin) {
+        String expresion = "^[0-9]{4,6}$";
+        Pattern patron = Pattern.compile(expresion);
+        return patron.matcher(pin).matches();
     }
 
 }
