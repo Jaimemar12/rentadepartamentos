@@ -141,7 +141,8 @@ public class RentaMenu implements Menu {
                 pagar(precio, "renta");
                 String idCliente = RentaControl.getClienteID(departamento.get("_id").toString());
                 Document renta = RentaControl.buscarRentaPorCliente(idCliente);
-                String nuevoBalance = String.valueOf(Integer.parseInt(renta.get("balance").toString()) - Integer.parseInt(precio));
+                String nuevoBalance = String
+                        .valueOf(Integer.parseInt(renta.get("balance").toString()) - Integer.parseInt(precio));
                 RentaControl.actualizarRenta(idCliente, "balance", nuevoBalance);
             }
         }
@@ -180,7 +181,7 @@ public class RentaMenu implements Menu {
                             variable = "fecha_fin";
                             break;
                         case "3":
-                            // TODO:
+                            variable = "balance";
                             break;
                         case "4":
                             variable = "deposito";
@@ -218,6 +219,18 @@ public class RentaMenu implements Menu {
                     System.out.println(
                             "\nIngresa el motivo de cancelacion");
                     String motivo = scn.nextLine();
+                    while (true) {
+                        System.out.println(
+                                "\nSe regresara el deposito? (si/no)");
+                        String respuesta = scn.nextLine();
+                        if (respuesta.toLowerCase().equals("si")) {
+                            RentaControl.actualizarRenta(idCliente, "deposito", "0");
+                            break;
+                        } else if (respuesta.toLowerCase().equals("no")) {
+                            break;
+                        }
+                        System.out.println("Ingresa si o no");
+                    }
                     RentaControl.actualizarRenta(idCliente, "motivo", motivo);
                     String idDepartamento = RentaControl.getDepartamentoID(idCliente);
                     String ubicacion = DepartamentoControl.getUbicacion(idDepartamento);
